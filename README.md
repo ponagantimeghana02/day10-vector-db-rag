@@ -9,3 +9,4 @@ embedding generator
 vector store
 
 
+document processor
