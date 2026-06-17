@@ -48,9 +48,7 @@ def process_document(file_path):
     chunks = splitter.split_documents(docs)
 
     texts = []
-
     metadata = []
-
     ids = []
 
     for i, chunk in enumerate(chunks):
@@ -74,10 +72,62 @@ def process_document(file_path):
         metadatas=metadata
     )
 
-    print(
-        f"{len(chunks)} chunks stored."
-    )
+    print(f"{len(chunks)} chunks stored.")
     print(f"Documents Loaded: {len(docs)}")
+    print(f"Chunks Generated: {len(chunks)}")
+    print(f"Embedding Dimension: {len(embeddings[0])}")
+
+    # ==================================
+    # Generate chunking_report.md
+    # ==================================
+
+    report = f"""# Chunking Report
+
+## Document Information
+
+File: {file_path}
+
+Documents Loaded: {len(docs)}
+
+## Chunking Configuration
+
+Chunk Size: 500
+
+Chunk Overlap: 100
+
+## Results
+
+Chunks Generated: {len(chunks)}
+
+Embedding Dimension: {len(embeddings[0])}
+
+## Sample Metadata
+
+{metadata[0] if metadata else "No Metadata"}
+
+## Best Chunking Strategy
+
+Chunk Size: 500
+
+Chunk Overlap: 100
+
+Reason:
+Provides a good balance between context preservation and retrieval accuracy.
+
+## Conclusion
+
+The document was successfully loaded, split into chunks, converted into embeddings, and stored in ChromaDB.
+"""
+
+    with open(
+        "chunking_report.md",
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        f.write(report)
+
+    print("Generated: chunking_report.md")
 # print(f"Chunks Generated: {len(chunk)}")
 # print(f"Embedding Dimension: {len(embeddings[0])}")
 

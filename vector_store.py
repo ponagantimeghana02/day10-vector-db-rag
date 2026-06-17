@@ -8,11 +8,12 @@ documents = [
     "Cloud computing provides scalable infrastructure."
 ]
 
+# ✅ FIXED METADATA KEY = "source"
 metadatas = [
-    {"document": "AI_Guide.pdf", "page": 1, "topic": "Artificial Intelligence"},
-    {"document": "AI_Guide.pdf", "page": 2, "topic": "Machine Learning"},
-    {"document": "AI_Guide.pdf", "page": 5, "topic": "Embeddings"},
-    {"document": "Cloud_Guide.pdf", "page": 3, "topic": "Cloud Computing"}
+    {"source": "AI_Guide.pdf", "page": 1, "topic": "Artificial Intelligence"},
+    {"source": "AI_Guide.pdf", "page": 2, "topic": "Machine Learning"},
+    {"source": "AI_Guide.pdf", "page": 5, "topic": "Embeddings"},
+    {"source": "Cloud_Guide.pdf", "page": 3, "topic": "Cloud Computing"}
 ]
 
 print("Loading embedding model...")
@@ -20,15 +21,9 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 
 embeddings = model.encode(documents).tolist()
 
-print(f"Generated {len(embeddings)} embeddings")
-print(f"Embedding Dimension: {len(embeddings[0])}")
+client = chromadb.PersistentClient(path="./chroma_db")
 
-client = chromadb.Client()
-
-collection = client.get_or_create_collection(
-    name="knowledge_base"
-)
-
+collection = client.get_or_create_collection(name="knowledge_base")
 
 collection.add(
     ids=[f"doc_{i}" for i in range(len(documents))],
@@ -37,31 +32,4 @@ collection.add(
     embeddings=embeddings
 )
 
-print("\nDocuments added successfully!")
-
-
-query = "How are embeddings stored for semantic search?"
-
-print(f"\nQuery: {query}")
-
-query_embedding = model.encode(query).tolist()
-
-results = collection.query(
-    query_embeddings=[query_embedding],
-    n_results=2
-)
-
-print("\nTop Matching Results:")
-print("-" * 50)
-
-for i in range(len(results["documents"][0])):
-    print(f"\nRank {i+1}")
-
-    print("Document Chunk:")
-    print(results["documents"][0][i])
-
-    print("\nMetadata:")
-    print(results["metadatas"][0][i])
-
-    if "distances" in results:
-        print(f"\nDistance Score: {results['distances'][0][i]}")
+print("Vector DB created successfully!")
